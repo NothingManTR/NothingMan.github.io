@@ -28,6 +28,44 @@
 			--bg-default: #121212;
 			--bg-paper: #1e1e1e;
 		}
+		.sensor-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1.5rem;
+			margin: 2rem 0;
+		}
+
+		.sensor-card {
+			background: var(--bg-paper);
+			padding: 1.5rem;
+			border-radius: 15px;
+			text-align: center;
+			border-left: 4px solid var(--primary-main);
+		}
+
+		.sensor-card i {
+			font-size: 2.5rem;
+			color: var(--primary-main);
+			margin-bottom: 1rem;
+		}
+
+		.alert-card {
+			background: #fff3cd;
+			color: #856404;
+			padding: 1rem;
+			border-radius: 8px;
+			margin: 1rem 0;
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			animation: pulse 1.5s infinite;
+		}
+
+		@keyframes pulse {
+			0% { transform: scale(1); }
+			50% { transform: scale(1.02); }
+			100% { transform: scale(1); }
+		}
 			/* Yeni Eklenen Responsive Stiller */
 	@media (max-width: 768px) {
 		/* Sadece Mobil için Stiller */
@@ -606,7 +644,44 @@
             border: 1px solid rgba(0,0,0,0.1);
             text-align: left;
         }
+		.sensor-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+			gap: 1.5rem;
+			margin: 2rem 0;
+		}
 
+		.sensor-card {
+			background: var(--bg-paper);
+			padding: 1.5rem;
+			border-radius: 15px;
+			text-align: center;
+			border-left: 4px solid var(--primary-main);
+		}
+
+		.sensor-card i {
+			font-size: 2.5rem;
+			color: var(--primary-main);
+			margin-bottom: 1rem;
+		}
+
+		.alert-card {
+			background: #fff3cd;
+			color: #856404;
+			padding: 1rem;
+			border-radius: 8px;
+			margin: 1rem 0;
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+			animation: pulse 1.5s infinite;
+		}
+
+		@keyframes pulse {
+			0% { transform: scale(1); }
+			50% { transform: scale(1.02); }
+			100% { transform: scale(1); }
+		}
         /* Gallery */
         .gallery-grid {
             display: grid;
@@ -799,6 +874,7 @@
                 <li><a class="nav-link" href="#project" onclick="showSection('project')">Proje</a></li>
                 <li><a class="nav-link" href="#team" onclick="showSection('team')">Ekip</a></li>
                 <li><a class="nav-link" href="#tech" onclick="showSection('tech')">Teknoloji</a></li>
+				<li><a class="nav-link" href="#simulation" onclick="showSection('simulation')">Simülasyon</a
                 <li><a class="nav-link" href="#gallery" onclick="showSection('gallery')">Galeri</a></li>
 				<li><a class="nav-link" href="#contact" onclick="showSection('contact')">İletişim</a></li>
             </ul>
@@ -1242,6 +1318,16 @@
 			</div>
 		</div>
 	</section>
+	<section id="simulation" class="page-section">
+		<div class="contact-container">
+			<h2 class="section-title">🌿 Canlı Bitki Simülasyonu</h2>
+			<div class="form-card" style="max-width: 800px; margin: 0 auto;">
+				<div id="status" class="status">
+					<!-- Sensör verileri buraya gelecek -->
+				</div>
+			</div>
+		</div>
+	</section>
 
     <script>
         // Tema Yönetimi
@@ -1340,6 +1426,90 @@
                 </div>`
             }
         };
+		// Simülasyon Fonksiyonları
+		function generateNoise(value, noiseRange) {
+			return value + (Math.random() - 0.5) * noiseRange * 4;
+		}
+
+		function stabilizeConditions(humidity, temperature, phValue) {
+			let messages = [];
+			if (humidity < 35.0) {
+				messages.push("🔴 Uyarı: Nem çok düşük! Sulama açılıyor...");
+				humidity += 10.0;
+			} else if (humidity > 65.0) {
+				messages.push("🔴 Uyarı: Nem çok yüksek! Havalandırma açılıyor...");
+				humidity -= 10.0;
+			}
+			if (temperature < 18.0) {
+				messages.push("🔴 Uyarı: Sıcaklık çok düşük! Isıtıcı açılıyor...");
+				temperature += 3.0;
+			} else if (temperature > 28.0) {
+				messages.push("🔴 Uyarı: Sıcaklık çok yüksek! Soğutma açılıyor...");
+				temperature -= 3.0;
+			}
+
+			if (phValue < 5.0) {
+				messages.push("🔴 Uyarı: pH çok düşük! Alkalin ekleniyor...");
+				phValue += 0.5;
+			} else if (phValue > 7.8) {
+				messages.push("🔴 Uyarı: pH çok yüksek! Asidik çözüm ekleniyor...");
+				phValue -= 0.5;
+			}
+			return { humidity, temperature, phValue, messages };
+		}
+		// Function to detect diseases
+		function diseaseDetection(temperature, humidity, phValue) {
+			let messages = [];
+
+			if (temperature > 33.0 && humidity < 30.0 && phValue < 5.5) {
+				messages.push("⚠️ Hastalık: Mantar enfeksiyonu riski!");
+			} else if (temperature < 16.0 && humidity > 75.0) {
+				messages.push("⚠️ Hastalık: Bakteriyel enfeksiyon riski!");
+			} else if (phValue > 7.6) {
+				messages.push("⚠️ Hastalık: Toprak dengesiz, kök hastalıkları oluşabilir!");
+			}
+
+			return messages;
+		}
+
+
+		function updateStatus() {
+			let humidity = generateNoise(50.0, 10.0);
+			let temperature = generateNoise(22.0, 5.0);
+			let phValue = generateNoise(6.5, 1.0);
+			
+			let stabilized = stabilizeConditions(humidity, temperature, phValue);
+			
+			let statusDiv = document.getElementById('status');
+			statusDiv.innerHTML = `
+				<div class="sensor-grid">
+					<div class="sensor-card">
+						<i class="fas fa-tint"></i>
+						<h3>${stabilized.humidity.toFixed(2)}%</h3>
+						<p>Nem Seviyesi</p>
+					</div>
+					<div class="sensor-card">
+						<i class="fas fa-thermometer-half"></i>
+						<h3>${stabilized.temperature.toFixed(2)}°C</h3>
+						<p>Sıcaklık</p>
+					</div>
+					<div class="sensor-card">
+						<i class="fas fa-flask"></i>
+						<h3>${stabilized.phValue.toFixed(2)}</h3>
+						<p>pH Değeri</p>
+					</div>
+				</div>
+				${stabilized.messages.map(msg => `
+					<div class="alert-card">
+						<i class="fas fa-exclamation-triangle"></i>
+						${msg}
+					</div>`).join('')}
+			`;
+		}
+
+		// Her 2 saniyede bir güncelle
+		setInterval(updateStatus, 2000);
+		updateStatus();
     </script>
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 </body>
